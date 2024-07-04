@@ -4,12 +4,10 @@ import org.openqa.selenium.edge.EdgeDriver;
 import java.util.*;
 
 public class Main {
+    public static WebDriver driver = new EdgeDriver();
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
-
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\Weston Prosser\\Downloads\\edgedriver_win64\\msedgedriver.exe");
-        WebDriver driver = new EdgeDriver();
 
         //Asks user for the location of the webpage to nativgate to -- Must be OP.GG
         System.out.println("Please enter a link to the desired OP.GG account: ");
@@ -19,13 +17,14 @@ public class Main {
         System.out.println("Please the number of games to gather data from: ");
         int numberOfRuns = sc.nextInt();
 
+        System.setProperty("webdriver.chrome.driver", "C:\\Users\\Weston Prosser\\Downloads\\edgedriver_win64\\msedgedriver.exe");
+
         //Navigates to the desired location
         driver.get(pageLocation);
 
-        double totalTime = 0;
-        int count = 0;
-
         int x = numberOfRuns;
+        int count = 0;
+        double totalTime = 0;
 
         while (count < x) {
             List<WebElement> lengths = driver.findElements(By.className("length")); // replace w/ the actual class name
@@ -38,7 +37,7 @@ public class Main {
                     int seconds = Integer.parseInt(timeParts[1].replace("s", ""));
                     double time = minutes + (double)seconds / 60; // convert time to decimal
                     totalTime += time; // add the time to the total
-                    System.out.println(length + " -- mins: " + minutes + " -- secs: " + seconds + " " + " -- Final Time: " + time);
+                    System.out.println(String.format("%s -- Minutes: %d -- Seconds: %d -- Final Time: %.2f -- Iteration %d/%d", length, minutes, seconds, time, count, numberOfRuns));
                 }
             }
 
@@ -51,16 +50,16 @@ public class Main {
                 showMoreButton.click();
 
                 Thread.sleep(500); // wait for 5 seconds
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (NoSuchElementException e) {
-                System.out.println("Error - No such element exception -");
-                break;
+                lookForOtherElement();
             }
         }
 
-        System.out.println("Total time: " + totalTime);
-        System.out.println("Total times in hours: " + totalTime/60);
+        System.out.println(String.format("Total time: %.2f", totalTime));
+        System.out.println(String.format("Total times in hours: %.2f", totalTime / 60));
         System.out.println("Count: " + count);
 
         driver.quit();
@@ -74,5 +73,18 @@ public class Main {
             return false;
         }
     }
+
+    public static void lookForOtherElement(){
+        try{
+            WebElement showMoreButton2 = driver.findElement(new By.ByXPath("/html/body/div[1]/div[10]/div[2]/button"));
+        } catch (NoSuchElementException e) {
+            System.out.println("Error - No such element exception\n");
+        }
+    }
+
+    //Note for future me -> NoSuchElementExcpetion are both catch statements in java.util and org.openqa.selenium.*
+    //                      This had me spend more time than I'd like to admit just losing my mind over why this didn't work
 }
+
+
 
